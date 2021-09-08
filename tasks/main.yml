@@ -1,0 +1,85 @@
+---
+- name: "install Development Tools dependency"
+  package:
+    name: "@Development Tools"
+    state: present
+  become: true
+- name: "install Power Tools dependency"
+  package:
+    name: dnf-plugins-core
+    state: present
+  become: true
+- name: "install {{ APP_NAME }} dependencies"
+  package:
+    name: "{{ APP_DEPENDENCIES }}"
+    state: present
+  become: true
+- name: Create the directory {{ APP_SRC }}
+  file:
+    name: "{{ APP_SRC }}"
+    state: directory
+    owner: "{{ APP_USER }}"
+    group: "{{ APP_GROUP }}"
+  become: yes
+- name: Check for the {{ APP_NAME }} README file
+  stat:
+    path: "{{ APP_SRC }}/readme.md"
+  register: APP_README_PATH
+- name: Clone the {{ APP_REPO }} source code into {{ APP_SRC }}
+  git:
+    repo: "{{ APP_REPO }}"
+    dest: "{{ APP_SRC }}"
+  when: not APP_README_PATH.stat.exists
+- name: Run {{ APP_NAME }} go run build.go tar
+  shell: go run build.go tar
+  args:
+    chdir: "{{ APP_SRC }}"
+- name: Find the {{ APP_NAME }}-*.tar.gz
+  shell:
+    cmd: "ls -1 {{ APP_SRC }}/{{ APP_NAME }}-*.tar.gz"
+  register: APP_ARCHIVE_PATH
+- name: Extract {{ APP_NAME }}-*.tar.gz
+  ansible.builtin.unarchive:
+    src: "{{ APP_ARCHIVE_PATH.stdout }}"
+    dest: "{{ APP_PATH }}"
+    remote_src: true
+    extra_opts: [--strip-components=1]
+- name: set SELinux permissions on {{ APP_NAME }} binaries
+  sefcontext:
+    target: "{{ APP_PATH }}/syncthing"
+    setype: bin_t
+  become: yes
+- name: reload SELinux policy to ensure that {{ APP_NAME }} is executable
+  command: "restorecon -irv {{ APP_PATH }}/syncthing"
+  become: yes
+- name: Create the {{ APP_NAME }} systemd service {{ APP_SYSTEMD }}. 
+  template:
+    src: app_service.ini
+    dest: "{{ APP_SYSTEMD }}"
+  become: yes
+  when: ansible_pkg_mgr != 'homebrew'
+- name: Reload the services. 
+  systemd:
+    daemon_reload: yes
+  become: yes
+  when: ansible_pkg_mgr != 'homebrew'
+- name: Start and enable the {{ APP_SERVICE }}@{{ APP_USER }} service. 
+  service:
+    name: "{{ APP_SERVICE }}@{{ APP_USER }}"
+    enabled: yes
+    state: restarted
+  become: yes
+  when: ansible_pkg_mgr != 'homebrew'
+- name: Create the {{ APP_NAME }} launchd service.
+  template:
+    src: solr_launchd_service.j2
+    dest: "~/Library/LaunchAgents/org.solr.plist"
+  when: ansible_pkg_mgr == 'homebrew'
+- name: Load the {{ APP_NAME }} launchd service.
+  shell: launchctl load ~/Library/LaunchAgents/org.solr.plist
+  when: ansible_pkg_mgr == 'homebrew'
+- name: Start the {{ APP_NAME }} launchd service.
+  shell: launchctl start org.solr
+  when: ansible_pkg_mgr == 'homebrew'
+  changed_when: false
+

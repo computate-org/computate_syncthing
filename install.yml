@@ -1,0 +1,7 @@
+---
+- name: Install the {{ APP_NAME }} podman container locally
+  connection: local
+  hosts: localhost
+  roles:
+    - computate.computate_syncthing
+
