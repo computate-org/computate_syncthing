@@ -1,6 +1,5 @@
+APP_PYTHON: "{{ '/usr/bin/python' if lookup('file', '/usr/bin/python', errors='ignore') else '/usr/bin/python3' }}"
 APP_NAME: "syncthing"
-APP_CONTAINER_NAME: "{{ APP_NAME }}"
-APP_CONTAINER_IMAGE: "{{ APP_NAME }}/{{ APP_NAME }}"
 APP_PATH: "/var/{{ APP_NAME }}"
 APP_GUI_PORT: "8384"
 APP_SYNC_PORT: "22000"
@@ -12,7 +11,6 @@ APP_REPO: git@github.com:syncthing/syncthing.git
 APP_SERVICE: "{{ APP_NAME }}"
 APP_SYSTEMD: "/usr/lib/systemd/system/{{ APP_SERVICE }}@.service"
 APP_DEPENDENCIES:
-  - go-compilers-golang-compiler
   - systemd
   - systemd-container
   - systemd-libs

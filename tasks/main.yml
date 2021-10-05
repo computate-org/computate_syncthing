@@ -14,6 +14,13 @@
     name: "{{ APP_DEPENDENCIES }}"
     state: present
   become: true
+- name: Create the directory {{ APP_PATH }}
+  file:
+    name: "{{ APP_PATH }}"
+    state: directory
+    owner: "{{ APP_USER }}"
+    group: "{{ APP_GROUP }}"
+  become: yes
 - name: Create the directory {{ APP_SRC }}
   file:
     name: "{{ APP_SRC }}"
@@ -49,6 +56,8 @@
     target: "{{ APP_PATH }}/syncthing"
     setype: bin_t
   become: yes
+  vars:
+    ansible_python_interpreter: "{{ APP_PYTHON }}"
 - name: reload SELinux policy to ensure that {{ APP_NAME }} is executable
   command: "restorecon -irv {{ APP_PATH }}/syncthing"
   become: yes
@@ -82,4 +91,7 @@
   shell: launchctl start org.solr
   when: ansible_pkg_mgr == 'homebrew'
   changed_when: false
+- name: "Show next steps"
+  debug:
+    msg: "In a browser, visit http://localhost:{{ APP_GUI_PORT }} to get started with {{ APP_NAME }}. "
 
