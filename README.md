@@ -4,7 +4,7 @@
 sudo yum install -y git python3 python3-pip python3-virtualenv python3-libselinux python3-libsemanage python3-policycoreutils
 virtualenv-3 ~/python
 source ~/python/bin/activate
-echo "~/python/bin/activate" | tee -a ~/.bashrc
+echo "source ~/python/bin/activate" | tee -a ~/.bashrc
 ```
 
 # Install the latest Ansible
