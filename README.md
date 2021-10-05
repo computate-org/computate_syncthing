@@ -9,7 +9,7 @@ echo "~/python/bin/activate" | tee -a ~/.bashrc
 
 # Install the latest Ansible
 
-#
+```bash
 pip install setuptools_rust wheel
 pip install --upgrade pip
 pip install ansible selinux setools
@@ -17,11 +17,15 @@ pip install ansible selinux setools
 
 # Install the syncthing ansible role
 
-```bash
-# Create a directory for the ansible role. 
-install -d ~/.ansible/roles/computate.computate_syncthing
+## Create a directory for the ansible role. 
 
-# Clone the syncthing ansible role. 
+```bash
+install -d ~/.ansible/roles/computate.computate_syncthing
+```
+
+## Clone the syncthing ansible role. 
+
+```bash
 git clone git@github.com:computate-org/computate_syncthing.git ~/.ansible/roles/computate.computate_syncthing
 ```
 
