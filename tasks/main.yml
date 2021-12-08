@@ -2,37 +2,37 @@
 - name: "Install dependencies: {{ APP_DEPENDENCIES | join(' ') }}"
   shell: "pkcon install -y {{ item }} | true"
   loop: "{{ APP_DEPENDENCIES }}"
-  #- name: Create the directory {{ APP_PATH }}
-  #  file:
-  #    name: "{{ APP_PATH }}"
-  #    state: directory
-  #- name: Create the directory {{ APP_SRC }}
-  #  file:
-  #    name: "{{ APP_SRC }}"
-  #    state: directory
-  #- name: Check for the {{ APP_NAME }} README file
-  #  stat:
-  #    path: "{{ APP_SRC }}/readme.md"
-  #  register: APP_README_PATH
-  #- name: Clone the {{ APP_REPO }} source code into {{ APP_SRC }}
-  #  git:
-  #    repo: "{{ APP_REPO }}"
-  #    dest: "{{ APP_SRC }}"
-  #  when: not APP_README_PATH.stat.exists
-  #- name: Run {{ APP_NAME }} go run build.go tar
-  #  shell: go run build.go tar
-  #  args:
-  #    chdir: "{{ APP_SRC }}"
-  #- name: Find the {{ APP_NAME }}-*.tar.gz
-  #  shell:
-  #    cmd: "ls -1 {{ APP_SRC }}/{{ APP_NAME }}-*.tar.gz"
-  #  register: APP_ARCHIVE_PATH
-  #- name: Extract {{ APP_NAME }}-*.tar.gz
-  #  ansible.builtin.unarchive:
-  #    src: "{{ APP_ARCHIVE_PATH.stdout }}"
-  #    dest: "{{ APP_PATH }}"
-  #    remote_src: true
-  #    extra_opts: [--strip-components=1]
+- name: Create the directory {{ APP_PATH }}
+  file:
+    name: "{{ APP_PATH }}"
+    state: directory
+- name: Create the directory {{ APP_SRC }}
+  file:
+    name: "{{ APP_SRC }}"
+    state: directory
+- name: Check for the {{ APP_NAME }} README file
+  stat:
+    path: "{{ APP_SRC }}/readme.md"
+  register: APP_README_PATH
+- name: Clone the {{ APP_REPO }} source code into {{ APP_SRC }}
+  git:
+    repo: "{{ APP_REPO }}"
+    dest: "{{ APP_SRC }}"
+  when: not APP_README_PATH.stat.exists
+- name: Run {{ APP_NAME }} go run build.go tar
+  shell: go run build.go tar
+  args:
+    chdir: "{{ APP_SRC }}"
+- name: Find the {{ APP_NAME }}-*.tar.gz
+  shell:
+    cmd: "ls -1 {{ APP_SRC }}/{{ APP_NAME }}-*.tar.gz"
+  register: APP_ARCHIVE_PATH
+- name: Extract {{ APP_NAME }}-*.tar.gz
+  ansible.builtin.unarchive:
+    src: "{{ APP_ARCHIVE_PATH.stdout }}"
+    dest: "{{ APP_PATH }}"
+    remote_src: true
+    extra_opts: [--strip-components=1]
 - name: Create the {{ APP_NAME }} systemd service {{ APP_SYSTEMD }}. 
   template:
     src: app_service.ini
@@ -43,7 +43,7 @@
     daemon_reload: yes
     scope: "{{ 'system' if ansible_distribution_file_variety == 'RedHat' and (ansible_distribution_major_version | int) <= 7 else 'user' }}"
   when: ansible_pkg_mgr != 'homebrew'
-- name: Start and enable the {{ APP_SERVICE }}@{{ APP_USER }} service. 
+- name: Start and enable the {{ APP_SERVICE }} service. 
   service:
     name: "{{ APP_SERVICE }}"
     enabled: yes

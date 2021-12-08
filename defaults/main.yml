@@ -10,7 +10,24 @@ APP_SRC: "{{ APP_PREFIX }}/src/{{ APP_NAME  }}"
 APP_PATH: "{{ APP_PREFIX }}/var/{{ APP_NAME  }}"
 APP_REPO: git@github.com:syncthing/syncthing.git
 APP_SERVICE: "{{ APP_NAME }}"
-APP_SYSTEMD: "{{ '/usr/lib/systemd/system' if ansible_distribution_file_variety == 'RedHat' and (ansible_distribution_major_version | int) <= 7 else (lookup('env', 'HOME') + '/.config/systemd/user') }}/{{ APP_SERVICE }}@.service"
+APP_SYSTEMD: "{{ '/usr/lib/systemd/system' if ansible_distribution_file_variety == 'RedHat' and (ansible_distribution_major_version | int) <= 7 else (lookup('env', 'HOME') + '/.config/systemd/user') }}/{{ APP_SERVICE }}.service"
 APP_DEPENDENCIES:
-  - syncthing
+  - systemd
+  - systemd-container
+  - systemd-libs
+  - systemd-pam
+  - systemd-udev
+  - golang
+  - golang-bin
+  - golang-src
+  - keyutils-libs-devel
+  - krb5-devel
+  - libcom_err-devel
+  - libkadm5
+  - libselinux-devel
+  - libsepol-devel
+  - libverto-devel
+  - openssl-devel
+  - pcre2-devel
+  - pcre2-utf32
 
