@@ -33,6 +33,10 @@
     dest: "{{ APP_PATH }}"
     remote_src: true
     extra_opts: [--strip-components=1]
+- name: Create the systemd user directory {{ APP_SYSTEMD | dirname }}
+  file:
+    name: "{{ APP_SYSTEMD | dirname }}"
+    state: directory
 - name: Create the {{ APP_NAME }} systemd service {{ APP_SYSTEMD }}. 
   template:
     src: app_service.ini
