@@ -18,6 +18,7 @@
   git:
     repo: "{{ APP_REPO }}"
     dest: "{{ APP_SRC }}"
+    version: "{{ APP_TAG }}"
   when: not APP_README_PATH.stat.exists
 - name: Run {{ APP_NAME }} go run build.go tar
   shell: go run build.go tar
