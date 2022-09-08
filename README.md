@@ -38,5 +38,17 @@ cd ~/.ansible/roles/computate.computate_syncthing
 ansible-playbook -K install.yml
 ```
 
+# Update firewall configuration
 
+```bash
+sudo firewall-cmd --zone=trusted --add-service=syncthing --permanent
+sudo firewall-cmd --reload
+```
+
+## Add trusted devices
+
+```bash
+sudo firewall-cmd --add-source 192.168.86.37/24 --zone trusted --permanent
+sudo firewall-cmd --reload
+```
 
